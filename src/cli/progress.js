@@ -1,8 +1,29 @@
 const progress = () => {
-  // Write your code here
-  // Simulate progress bar from 0% to 100% over ~5 seconds
-  // Update in place using \r every 100ms
-  // Format: [████████████████████          ] 67%
+  const totalDuration = 5000; // 5 seconds
+  const updateInterval = 100; // Update every 100ms
+  const totalSteps = totalDuration / updateInterval;
+  const barWidth = 30;
+
+  let currentStep = 0;
+
+  const drawProgress = (percent) => {
+    const filled = Math.floor((barWidth * percent) / 100);
+    const empty = barWidth - filled;
+    const bar = '█'.repeat(filled) + ' '.repeat(empty);
+    process.stdout.write(`\r[${bar}] ${percent}%`);
+  };
+
+  const timer = setInterval(() => {
+    currentStep++;
+    const percent = Math.floor((currentStep / totalSteps) * 100);
+
+    drawProgress(percent);
+
+    if (currentStep >= totalSteps) {
+      clearInterval(timer);
+      console.log('\nProgress complete!');
+    }
+  }, updateInterval);
 };
 
 progress();
