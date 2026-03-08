@@ -26,14 +26,14 @@ const snapshot = async () => {
 
         if (stats.isDirectory()) {
           entries.push({
-            path: relativePath,
+            path: relativePath.replace(/\\/g, '/'),
             type: 'directory'
           });
           await scanDir(fullPath, basePath);
         } else if (stats.isFile()) {
           const content = await readFile(fullPath);
           entries.push({
-            path: relativePath,
+            path: relativePath.replace(/\\/g, '/'),
             type: 'file',
             size: stats.size,
             content: content.toString('base64')
