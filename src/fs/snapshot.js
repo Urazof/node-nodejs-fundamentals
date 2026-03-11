@@ -10,6 +10,16 @@ const snapshot = async () => {
   const workspacePath = join(__dirname, '../../workspace');
   const snapshotPath = join(workspacePath, 'snapshot.json');
 
+  // Проверка существования workspace
+  try {
+    const stats = await stat(workspacePath);
+    if (!stats.isDirectory()) {
+      throw new Error('FS operation failed');
+    }
+  } catch (err) {
+    throw new Error('FS operation failed');
+  }
+
   const entries = [];
 
   const scanDir = async (dirPath, basePath) => {
@@ -48,7 +58,7 @@ const snapshot = async () => {
   await scanDir(workspacePath, workspacePath);
 
   const snapshot = {
-    rootPath: workspacePath,
+    rootPath: 'workspace',
     entries: entries
   };
 

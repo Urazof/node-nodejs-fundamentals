@@ -1,4 +1,4 @@
-import { readFile, createReadStream } from 'fs';
+import { readFile, createReadStream, stat } from 'fs';
 import { createHash } from 'crypto';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
@@ -8,10 +8,18 @@ import { promisify } from 'util';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const readFileAsync = promisify(readFile);
+const statAsync = promisify(stat);
 
 const verify = async () => {
   const workspacePath = join(__dirname, '../../workspace');
   const checksumsPath = join(workspacePath, 'checksums.json');
+
+  // Проверка существования checksums.json
+  try {
+    await statAsync(checksumsPath);
+  } catch (err) {
+    throw new Error('FS operation failed');
+  }
 
   // Read checksums file
   const checksumsData = await readFileAsync(checksumsPath, 'utf-8');

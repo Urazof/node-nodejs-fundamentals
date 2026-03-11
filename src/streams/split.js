@@ -51,14 +51,15 @@ const split = async () => {
     },
 
     flush(callback) {
-      // Process remaining buffer
+      // Process remaining buffer (without trailing newline)
       if (buffer.length > 0) {
         if (currentLines >= maxLines) {
           currentStream.end();
           currentChunk++;
           currentStream = createWriteStream(join(workspacePath, `chunk_${currentChunk}.txt`));
         }
-        currentStream.write(buffer + '\n');
+        // Don't add newline to last line
+        currentStream.write(buffer);
       }
       currentStream.end();
       callback();

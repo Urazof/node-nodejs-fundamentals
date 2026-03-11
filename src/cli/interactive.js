@@ -2,6 +2,8 @@ import * as readline from 'readline';
 import { stdin, stdout, uptime, cwd } from 'process';
 
 const interactive = () => {
+  let closing = false;
+
   const rl = readline.createInterface({
     input: stdin,
     output: stdout,
@@ -29,6 +31,7 @@ const interactive = () => {
         break;
 
       case 'exit':
+        closing = true;
         console.log('Goodbye!');
         rl.close();
         return;
@@ -42,11 +45,15 @@ const interactive = () => {
   });
 
   rl.on('SIGINT', () => {
-    console.log('\nReceived SIGINT. Type "exit" to quit.');
-    rl.prompt();
+    console.log('\nGoodbye!');
+    closing = true;
+    rl.close();
   });
 
   rl.on('close', () => {
+    if (!closing) {
+      console.log('Goodbye!');
+    }
     process.exit(0);
   });
 };

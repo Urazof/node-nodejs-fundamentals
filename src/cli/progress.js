@@ -1,6 +1,15 @@
 const progress = () => {
-  const totalDuration = 5000; // 5 seconds
-  const updateInterval = 100; // Update every 100ms
+  // Парсинг аргументов командной строки
+  const args = process.argv.slice(2);
+  let totalDuration = 5000; // По умолчанию 5 секунд
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--duration' && args[i + 1]) {
+      totalDuration = parseInt(args[i + 1], 10) * 1000; // конвертируем в миллисекунды
+    }
+  }
+
+  const updateInterval = 100; // Обновление каждые 100ms
   const totalSteps = totalDuration / updateInterval;
   const barWidth = 30;
 
@@ -12,6 +21,11 @@ const progress = () => {
     const bar = '█'.repeat(filled) + ' '.repeat(empty);
     process.stdout.write(`\r[${bar}] ${percent}%`);
   };
+
+  // Показываем начальный прогресс сразу
+  setImmediate(() => {
+    drawProgress(0);
+  });
 
   const timer = setInterval(() => {
     currentStep++;

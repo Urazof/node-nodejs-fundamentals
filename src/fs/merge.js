@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'fs/promises';
+import { readdir, readFile, writeFile, stat } from 'fs/promises';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -10,6 +10,13 @@ const merge = async () => {
   const workspacePath = join(__dirname, '../../workspace');
   const partsPath = join(workspacePath, 'parts');
   const mergedPath = join(workspacePath, 'merged.txt');
+
+  // Проверка существования папки parts
+  try {
+    await stat(partsPath);
+  } catch (err) {
+    throw new Error('FS operation failed');
+  }
 
   // Parse CLI arguments
   const args = process.argv.slice(2);
@@ -26,24 +33,34 @@ const merge = async () => {
   if (filesList) {
     // Use provided order
     files = filesList;
+
+    // Проверка существования всех запрошенных файлов
+    for (const file of files) {
+      try {
+        await stat(join(partsPath, file));
+      } catch (err) {
+        throw new Error('FS operation failed');
+      }
+    }
   } else {
     // Read all .txt files in alphabetical order
     const allFiles = await readdir(partsPath);
     files = allFiles
       .filter(f => f.endsWith('.txt'))
       .sort();
+
+    // Проверка, что найдены .txt файлы
+    if (files.length === 0) {
+      throw new Error('FS operation failed');
+    }
   }
 
   // Read and merge content
   const contents = [];
   for (const file of files) {
-    try {
-      const filePath = join(partsPath, file);
-      const content = await readFile(filePath, 'utf-8');
-      contents.push(content);
-    } catch (err) {
-      console.error(`Warning: Could not read ${file}`);
-    }
+    const filePath = join(partsPath, file);
+    const content = await readFile(filePath, 'utf-8');
+    contents.push(content);
   }
 
   // Write merged content

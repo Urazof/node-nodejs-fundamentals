@@ -1,5 +1,6 @@
 import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
+import { access } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,6 +17,15 @@ const dynamic = async () => {
 
   try {
     const pluginPath = join(__dirname, 'plugins', `${pluginName}.js`);
+
+    // Check if file exists first
+    try {
+      await access(pluginPath);
+    } catch {
+      console.log('Plugin not found');
+      process.exit(1);
+    }
+
     const pluginUrl = pathToFileURL(pluginPath).href;
     const plugin = await import(pluginUrl);
 
@@ -27,15 +37,10 @@ const dynamic = async () => {
     const result = plugin.run();
     console.log(result);
   } catch (err) {
-    if (err.code === 'ERR_MODULE_NOT_FOUND' || err.code === 'ENOENT') {
-      console.error(`Error: Plugin ${pluginName} not found`);
-    } else {
-      console.error(`Error loading plugin: ${err.message}`);
-    }
+    console.error(`Error loading plugin: ${err.message}`);
+    process.exit(1);
   }
 };
-
-await dynamic();
 
 await dynamic();
 
