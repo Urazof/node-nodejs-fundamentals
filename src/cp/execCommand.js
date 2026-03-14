@@ -25,9 +25,12 @@ const execCommand = () => {
 
   // Spawn child process
   const child = spawn(command, commandArgs, {
-    env: process.env,
-    stdio: 'inherit' // This automatically pipes stdin/stdout/stderr
+    env: process.env
   });
+
+  // Explicitly pipe stdout and stderr
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
 
   // Handle child process exit
   child.on('exit', (code) => {

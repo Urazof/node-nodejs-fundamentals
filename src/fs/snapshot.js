@@ -58,7 +58,7 @@ const snapshot = async () => {
   await scanDir(workspacePath, workspacePath);
 
   const snapshot = {
-    rootPath: 'workspace',
+    rootPath: workspacePath,
     entries: entries
   };
 

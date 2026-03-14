@@ -43,7 +43,12 @@ const split = async () => {
           currentStream = createWriteStream(join(workspacePath, `chunk_${currentChunk}.txt`));
         }
 
-        currentStream.write(line + '\n');
+        // Добавляем перенос только если это не первая строка в файле
+        if (currentLines > 0) {
+          currentStream.write('\n' + line);
+        } else {
+          currentStream.write(line);
+        }
         currentLines++;
       }
 
@@ -57,9 +62,14 @@ const split = async () => {
           currentStream.end();
           currentChunk++;
           currentStream = createWriteStream(join(workspacePath, `chunk_${currentChunk}.txt`));
+          currentLines = 0;
         }
-        // Don't add newline to last line
-        currentStream.write(buffer);
+        // Добавляем перенос только если это не первая строка в файле
+        if (currentLines > 0) {
+          currentStream.write('\n' + buffer);
+        } else {
+          currentStream.write(buffer);
+        }
       }
       currentStream.end();
       callback();

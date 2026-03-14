@@ -58,6 +58,8 @@ const findByExt = async () => {
 
   await searchDir(workspacePath);
 
+  // Сортируем результаты перед выводом
+  results.sort();
   results.forEach(file => console.log(file));
 };
 
